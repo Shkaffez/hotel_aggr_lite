@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/createUser.dto';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
+import { SearchUsersDto } from './dto/searchUsers.dto';
+import { RolesGuard } from '../../guards/roles.guard';
+import { Roles } from '../../utils/roles.decorator';
+import { Role } from '../../utils/role.enum';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
-@Controller('users')
+
+@ApiTags('Users')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Post('/admin/users/')
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: CreateUserDto })
+  public create(@Body() data: CreateUserDto) {
+    const { email, password, name, contactPhone, role } = data;
+    const passwordHash = bcrypt.hashSync(password, 10);
+    return this.usersService.create({
+      email,
+      passwordHash,
+      name,
+      contactPhone,
+      role,
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('/admin/users/')
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  public findAsAdmin(@Query() query: SearchUsersDto) {
+    return this.usersService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Get('/manager/users/')
+  @Roles(Role.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  public findAsManager(@Query() query: SearchUsersDto) {
+    return this.usersService.findAll(query);
   }
 }

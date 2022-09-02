@@ -1,4 +1,4 @@
-import { ID } from '../id.type';
+import { ID } from '../../id.type';
 import { Reservation } from './schemas/reservation.schema';
 
 export interface Reservationdto {

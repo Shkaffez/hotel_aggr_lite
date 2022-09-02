@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseFilters, UseGuards, Request, } from '@nestjs/common';
+import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { CreateUserDto } from '../users/dto/createUser.dto';
+import * as bcript from 'bcrypt';
+import { MongoExceptionFilter } from '../../utils/mongoExceptionFilter';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { User } from '../users/schemas/user.schema';
 
-@Controller('auth')
+@ApiTags('Auth')
+@Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('/client/register')
+  @UseFilters(MongoExceptionFilter)
+  @ApiResponse({ status: 200, description: 'The user has been created', type: User })
+  async singup(@Body() data: CreateUserDto): Promise<Partial<User>> {
+    const { email, password, name, contactPhone } = data;
+    const passwordHash = bcript.hashSync(password, 10);
+
+    return this.authService.signup({ email, passwordHash, name, contactPhone });
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @UseGuards(LocalAuthGuard)
+  @ApiResponse({ status: 200, description: 'login' })
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+
+  @Get('/auth/logout')
+  @ApiResponse({ status: 200, description: 'logout' })
+  logout(@Request() req) {
+    req.logout();
+    return { status: 'logout' };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-  }
 }

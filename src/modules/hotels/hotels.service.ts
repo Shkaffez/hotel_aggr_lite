@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { ID } from '../id.type';
+import { ID } from '../../id.type';
 import { IHotelService, SearchHotelsParams } from './interfaces';
 import { Hotel, HotelDocument } from './schemas/hotel.schema';
 
@@ -10,7 +10,7 @@ export class HotelsService implements IHotelService {
   constructor(
     @InjectModel(Hotel.name) private readonly HotelModel: Model<HotelDocument>,
     @InjectConnection() private connection: Connection,
-  ) {}
+  ) { }
 
   async create(data: any): Promise<Hotel> {
     const { title, description } = data;

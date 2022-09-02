@@ -1,20 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { User, UserDocument } from '../users/schemas/user.schema';
+import * as mongoose from 'mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(User.name) private readonly UserModel: Model<UserDocument>,
+    @InjectConnection() private connection: Connection,
     private usersService: UsersService,
     private jwtService: JwtService
   ) { }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
+  public async signup(data: Partial<User>): Promise<Partial<User>> {
+    const _id = new mongoose.Types.ObjectId();
+    const { email, passwordHash, name, contactPhone } = data;
+    const newUser = new this.UserModel({
+      _id,
+      email,
+      passwordHash,
+      name,
+      contactPhone,
+    });
+    await newUser.save();
+    return { _id, email, name };
+  }
+
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findByEmail(email);
+    if (user && bcrypt.compareSync(password, user.passwordHash)) {
+      const { passwordHash, ...result } = user;
       return result;
     }
     return null;
@@ -32,23 +54,5 @@ export class AuthService {
 
 
 
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 }

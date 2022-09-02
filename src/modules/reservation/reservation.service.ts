@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { ID } from '../id.type';
 import {
   IReservation,
   Reservationdto,
@@ -9,6 +8,7 @@ import {
 } from './interfaces';
 import { Reservation, ReservationDocument } from './schemas/reservation.schema';
 import * as mongoose from 'mongoose';
+import { ID } from '../../id.type';
 
 @Injectable()
 export class ReservationService implements IReservation {

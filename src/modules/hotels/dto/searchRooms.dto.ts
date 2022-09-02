@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { ID } from 'src/modules/id.type';
+import { ID } from '../../../id.type';
 
 export class SearchRoomsDto {
   @IsNumber()

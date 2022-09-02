@@ -14,12 +14,11 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
-import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { editFileName } from 'src/utils/file-uploading.utils';
-import { imageFileFilter } from 'src/utils/imageFileFilter';
-import { Role } from 'src/utils/role.enum';
-import { Roles } from 'src/utils/roles.decorator';
+import { RolesGuard } from '../../guards/roles.guard';
+import { editFileName } from '../../utils/file-uploading.utils';
+import { imageFileFilter } from '../../utils/imageFileFilter';
+import { Role } from '../../utils/role.enum';
+import { Roles } from '../../utils/roles.decorator';
 import { NewHotelDto } from './dto/newHotel.dto';
 import { NewRoomDto } from './dto/newRoom.dto';
 import { SearchHotelsDto } from './dto/searchHotels.dto';
@@ -27,6 +26,7 @@ import { SearchRoomsDto } from './dto/searchRooms.dto';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
 import { HotelRoomsService } from './hotel.rooms.service';
 import { HotelsService } from './hotels.service';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @ApiTags('Hotel')
 @Controller()
@@ -49,7 +49,7 @@ export class HotelsController {
   @Post('/admin/hotels/')
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(JwtAuthGuard)
   addNewHotel(@Body() data: NewHotelDto) {
     return this.hotelService.create(data);
   }
@@ -57,7 +57,7 @@ export class HotelsController {
   @Get('/admin/hotels/')
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(JwtAuthGuard)
   searchHotels(@Query() data: SearchHotelsDto) {
     return this.hotelService.search(data);
   }
@@ -65,7 +65,7 @@ export class HotelsController {
   @Put('/admin/hotels/:id')
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(JwtAuthGuard)
   updateHotel(@Param('id') id, @Body() data: NewHotelDto) {
     return this.hotelService.update(id, data);
   }

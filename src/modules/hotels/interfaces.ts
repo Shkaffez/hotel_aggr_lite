@@ -1,4 +1,4 @@
-import { ID } from '../id.type';
+import { ID } from '../../id.type';
 import { Hotel } from './schemas/hotel.schema';
 import { HotelRoom } from './schemas/HotelRoom.schema';
 
