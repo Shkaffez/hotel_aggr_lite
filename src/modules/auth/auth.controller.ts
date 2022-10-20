@@ -6,6 +6,7 @@ import * as bcript from 'bcrypt';
 import { MongoExceptionFilter } from '../../utils/mongoExceptionFilter';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../users/schemas/user.schema';
+import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @ApiTags('Auth')
 @Controller()
@@ -15,7 +16,7 @@ export class AuthController {
   @Post('/client/register')
   @UseFilters(MongoExceptionFilter)
   @ApiResponse({ status: 200, description: 'The user has been created', type: User })
-  async singup(@Body() data: CreateUserDto): Promise<Partial<User>> {
+  async singup(@Body() data: CreateUserDto) {
     const { email, password, name, contactPhone } = data;
     const passwordHash = bcript.hashSync(password, 10);
 
@@ -26,9 +27,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'login' })
   @Post('auth/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);;
+    return this.authService.login(req.user);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('auth/check')
+  @ApiResponse({ status: 200, description: 'check' })
+  async check(@Request() req) {
+    return this.authService.check(req.user);
+  }
 
   @Get('/auth/logout')
   @ApiResponse({ status: 200, description: 'logout' })
@@ -36,5 +43,6 @@ export class AuthController {
     req.logout();
     return { status: 'logout' };
   }
+
 
 }

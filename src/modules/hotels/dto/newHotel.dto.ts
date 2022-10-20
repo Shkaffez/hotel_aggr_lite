@@ -9,4 +9,8 @@ export class NewHotelDto {
   @IsString()
   @ApiProperty()
   description: string;
+
+  @IsString()
+  @ApiProperty()
+  city: string;
 }

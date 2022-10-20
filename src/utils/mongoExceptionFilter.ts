@@ -17,7 +17,7 @@ export class MongoExceptionFilter implements ExceptionFilter {
         response.statusCode = HttpStatus.BAD_REQUEST;
         response.json({
           statusCode: HttpStatus.BAD_REQUEST,
-          message: 'this email is already taken',
+          message: 'Этот email уже использовался для регистрации',
         });
     }
   }

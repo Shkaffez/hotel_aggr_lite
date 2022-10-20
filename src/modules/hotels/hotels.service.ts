@@ -13,27 +13,29 @@ export class HotelsService implements IHotelService {
   ) { }
 
   async create(data: any): Promise<Hotel> {
-    const { title, description } = data;
+    const { title, description, city, images } = data;
     const updateAt = new Date();
     const newHotel = new this.HotelModel({
       title,
       description,
+      city,
       updateAt,
+      // images
     });
     await newHotel.save();
     return await this.HotelModel.findById({ _id: newHotel._id }).select(
-      '_id title description',
+      '_id title description city images',
     );
   }
 
   async update(id: string, data: any): Promise<Hotel> {
-    const { title, description } = data;
+    const { title, description, city } = data;
     const updateAt = new Date();
     return await this.HotelModel.findByIdAndUpdate(
       id,
-      { title, description, updateAt },
+      { title, description, city, updateAt },
       { new: true },
-    ).select('_id title description');
+    ).select('_id title description city');
   }
 
   async findById(id: ID): Promise<Hotel> {
@@ -45,6 +47,6 @@ export class HotelsService implements IHotelService {
     return await this.HotelModel.find()
       .skip(offset)
       .limit(limit)
-      .select('_id title description');
+      .select('_id title description city images');
   }
 }

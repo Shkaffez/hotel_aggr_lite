@@ -17,7 +17,7 @@ export class UsersService implements IUserService {
   ) { }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.UserModel.findOne({ email: email });
+    return await this.UserModel.findOne({ email: email }).lean();
   }
 
   async create(data: Partial<User>): Promise<Omit<User, 'passwordHash'>> {

@@ -2,12 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { ID } from '../../id.type';
-import { HotelRoomService, SearchRoomsParams } from './interfaces';
+import { IHotelRoomService, SearchRoomsParams } from './interfaces';
 import { HotelRoom, HotelRoomDocument } from './schemas/HotelRoom.schema';
 import * as mongoose from 'mongoose';
 
 @Injectable()
-export class HotelRoomsService implements HotelRoomService {
+export class HotelRoomsService implements IHotelRoomService {
   constructor(
     @InjectModel(HotelRoom.name)
     private readonly HotelRoomModel: Model<HotelRoomDocument>,

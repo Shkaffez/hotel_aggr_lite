@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import * as mongoose from 'mongoose';
 import { Model } from 'mongoose';
+import { Role } from '../../utils/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
-  public async signup(data: Partial<User>): Promise<Partial<User>> {
+  public async signup(data: Partial<User>) {
     const _id = new mongoose.Types.ObjectId();
     const { email, passwordHash, name, contactPhone } = data;
     const newUser = new this.UserModel({
@@ -29,9 +30,12 @@ export class AuthService {
       contactPhone,
     });
     await newUser.save();
-    return { _id, email, name };
+    return {
+      access_token: this.jwtService.sign({ _id: _id, email: email, name: name, role: Role.Client }, {
+        secret: process.env.SECRET_KEY,
+      })
+    }
   }
-
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
@@ -43,9 +47,17 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+
     return {
-      access_token: this.jwtService.sign(payload, {
+      access_token: this.jwtService.sign({ _id: user._id, email: user.email, name: user.name, role: user.role }, {
+        secret: process.env.SECRET_KEY,
+      }),
+    };
+  }
+
+  async check(user: any) {
+    return {
+      access_token: this.jwtService.sign({ _id: user._id, email: user.email, name: user.name, role: user.role }, {
         secret: process.env.SECRET_KEY,
       }),
     };

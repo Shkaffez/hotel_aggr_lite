@@ -10,9 +10,13 @@ export class Hotel {
   @ApiProperty()
   title: string;
 
-  @Prop()
+  @Prop({ required: true })
   @ApiProperty()
   description: string;
+
+  @Prop({ required: true })
+  @ApiProperty()
+  city: string;
 
   @Prop({ required: true, default: new Date() })
   @ApiProperty()
@@ -21,6 +25,10 @@ export class Hotel {
   @Prop()
   @ApiProperty()
   updatedAt: Date;
+
+  @Prop({ default: [] })
+  @ApiProperty()
+  images: Array<string>;
 }
 
 export const HotelSchema = SchemaFactory.createForClass(Hotel);

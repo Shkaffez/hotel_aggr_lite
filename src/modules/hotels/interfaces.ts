@@ -20,7 +20,7 @@ export interface SearchHotelsParams {
   offset: number;
 }
 
-export interface HotelRoomService {
+export interface IHotelRoomService {
   create(data: Partial<HotelRoom>): Promise<HotelRoom>;
   findById(id: ID, isEnabled?: true): Promise<HotelRoom>;
   search(params: SearchRoomsParams): Promise<HotelRoom[]>;
