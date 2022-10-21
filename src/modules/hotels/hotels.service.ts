@@ -20,7 +20,7 @@ export class HotelsService implements IHotelService {
       description,
       city,
       updateAt,
-      // images
+      images
     });
     await newHotel.save();
     return await this.HotelModel.findById({ _id: newHotel._id }).select(

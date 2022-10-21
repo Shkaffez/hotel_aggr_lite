@@ -13,4 +13,6 @@ export class NewHotelDto {
   @IsString()
   @ApiProperty()
   city: string;
+
+
 }

@@ -47,7 +47,6 @@ export class AuthService {
   }
 
   async login(user: any) {
-
     return {
       access_token: this.jwtService.sign({ _id: user._id, email: user.email, name: user.name, role: user.role }, {
         secret: process.env.SECRET_KEY,

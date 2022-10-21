@@ -27,6 +27,10 @@ import { HotelRoomsService } from './hotel.rooms.service';
 import { HotelsService } from './hotels.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
+/*
+  Добавить DELETE методы отеля и комнаты для админа.
+*/
+
 @ApiTags('Hotel')
 @Controller()
 export class HotelsController {
@@ -35,10 +39,6 @@ export class HotelsController {
     private readonly hotelRoomService: HotelRoomsService,
   ) { }
 
-  // @Get('/test')
-  // getImg(@Res() res) {
-  //   return res.sendFile(join(__dirname, '../../..', '/files/images.png'));
-  // }
 
   @Get('/hotels/')
   searchHotels(@Query() data: SearchHotelsDto) {
@@ -65,17 +65,19 @@ export class HotelsController {
       fileFilter: imageFileFilter,
     }),
   )
-  @Roles(Role.Admin)
-  @UseGuards(RolesGuard)
+  // @Roles(Role.Admin)
   @UseGuards(JwtAuthGuard)
+  // @UseGuards(RolesGuard)
   addNewHotel(
     @Body() data: NewHotelDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
+    console.log(data)
+    console.log("files", files)
     const { title, description, city } = data;
     let images = [];
     files.forEach((file) => images.push(file.filename));
-    console.log(files)
+    console.log("images", images)
     return this.hotelService.create({
       title, description, city, images
     });
@@ -101,6 +103,7 @@ export class HotelsController {
     const { title, hotelId, description } = data;
     let images = [];
     files.forEach((file) => images.push(file.filename));
+    console.log(images);
     return this.hotelRoomService.create({
       title,
       hotel: hotelId,
