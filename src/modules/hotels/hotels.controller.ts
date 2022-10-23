@@ -29,6 +29,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 /*
   Добавить DELETE методы отеля и комнаты для админа.
+  Дописать обработку файлов PUT методам.
 */
 
 @ApiTags('Hotel')
@@ -55,6 +56,8 @@ export class HotelsController {
     return this.hotelRoomService.findById(id);
   }
 
+
+
   @Post('/admin/hotels/')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
@@ -65,23 +68,21 @@ export class HotelsController {
       fileFilter: imageFileFilter,
     }),
   )
-  // @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard)
-  // @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   addNewHotel(
-    @Body() data: NewHotelDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() data: NewHotelDto,
   ) {
-    console.log(data)
-    console.log("files", files)
     const { title, description, city } = data;
-    let images = [];
-    files.forEach((file) => images.push(file.filename));
-    console.log("images", images)
+    let imagesName = [];
+    files.forEach((file) => imagesName.push(file.filename));
     return this.hotelService.create({
-      title, description, city, images
+      title, description, city, imagesName
     });
   }
+
+
 
   @Post('/admin/hotel-rooms/')
   @UseInterceptors(
@@ -93,9 +94,8 @@ export class HotelsController {
       fileFilter: imageFileFilter,
     }),
   )
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtAuthGuard)
   addNewRoom(
     @Body() data: NewRoomDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
@@ -113,9 +113,8 @@ export class HotelsController {
   }
 
   @Put('/admin/hotels/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtAuthGuard)
   updateHotel(@Param('id') id, @Body() data: NewHotelDto) {
     return this.hotelService.update(id, data);
   }
@@ -130,6 +129,8 @@ export class HotelsController {
       fileFilter: imageFileFilter,
     }),
   )
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   updateRoom(
     @Body() body: UpdateRoomDto,
     @Param('id') id,
