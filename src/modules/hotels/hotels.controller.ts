@@ -74,11 +74,12 @@ export class HotelsController {
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() data: NewHotelDto,
   ) {
+    console.log(files)
     const { title, description, city } = data;
-    let imagesName = [];
-    files.forEach((file) => imagesName.push(file.filename));
+    let images = [];
+    files.forEach((file) => images.push(file.filename));
     return this.hotelService.create({
-      title, description, city, imagesName
+      title, description, city, images
     });
   }
 
